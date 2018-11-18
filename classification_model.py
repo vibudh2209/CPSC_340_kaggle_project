@@ -38,7 +38,7 @@ def rf_classifier(feat):
         Over_under_y_train[2*i] = y_pos[idx_pos]
         Over_under_X_train[2*i+1,:] = X_neg[idx_neg,:]
         Over_under_y_train[2*i+1] = y_neg[idx_neg]
-    rf = RandomForestClassifier(n_estimators=n_estimators).fit(Over_under_X_train,Over_under_y_train)
+    rf = RandomForestClassifier(n_estimators=n_estimators,max_features=max_features).fit(Over_under_X_train,Over_under_y_train)
     X_pos = []
     y_pos = []
     X_neg = []
