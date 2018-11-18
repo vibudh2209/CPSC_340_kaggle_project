@@ -6,8 +6,14 @@ import multiprocessing
 from multiprocessing import Pool
 from contextlib import closing
 from functools import partial
-from sklearn.metrics import precision_score,recall_score,accuracy_score
+from sklearn.metrics import precision_score,recall_score,accuracy_score,roc_curve,auc
 from scipy.stats import mode
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-n_feat','--nf',required=True)
+io_args = parser.parse_args()
+nf = int(io_args.nf)
 
 t=time.time()
 X_valid = pd.read_csv('X_valid.csv',sep=',',header=0).values
@@ -51,17 +57,22 @@ def rf_classifier(feat):
     valid_pred = rf.predict(X_valid)
     X_train = []
     X_valid = []
+    fpr_tr, tpr_tr, thresh_tr = roc_curve(y_train, train_pred)
+    fpr_vl, tpr_vl, thresh_vl = roc_curve(y_valid, valid_pred)
+
+    auc_tr = auc(fpr_tr,tpr_tr)
+    auc_vl = auc(fpr_vl,tpr_vl)
+
     print(time.time()-t)
     with open('hyperparameter_file.csv','a') as ref:
-        ref.write(str(max_features)+','+str(n_estimators)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
+        ref.write(str(max_features)+','+str(n_estimators)+','+str(auc_tr)+','+str(auc_vl)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
 
 
 hy_params = []
 for n_estimators in [100,200,300,400,500,600,700,800,900,1000]:
-    for max_features in np.linspace(10,50,41):
-        hy_params.append([max_features,n_estimators])
+    hy_params.append([int(nf),n_estimators])
 
 t=time.time()
-with closing(Pool(24)) as pool:
+with closing(Pool(10)) as pool:
     pool.map(rf_classifier,hy_params)
 print(time.time()-t)
