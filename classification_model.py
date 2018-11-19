@@ -16,17 +16,17 @@ io_args = parser.parse_args()
 nf = int(io_args.nf)
 
 t=time.time()
-X_valid = pd.read_csv('X_valid.csv',sep=',',header=0).values
-y_valid = pd.read_csv('y_valid.csv',sep=',',header=None).values
-X_train = pd.read_csv('X_train.csv',sep=',',header=0).values
-y_train = pd.read_csv('y_train.csv',sep=',',header=0).values
+X_valid = pd.read_csv('../X_valid.csv',sep=',',header=0).values
+y_valid = pd.read_csv('../y_valid.csv',sep=',',header=None).values
+X_train = pd.read_csv('../X_train.csv',sep=',',header=0).values
+y_train = pd.read_csv('../y_train.csv',sep=',',header=0).values
 print(time.time()-t)
 
 def rf_classifier(feat):
     t=time.time()
     max_features,n_estimators = feat
-    X_train = pd.read_csv('X_train.csv',sep=',',header=0).values
-    y_train = pd.read_csv('y_train.csv',sep=',',header=0).values
+    X_train = pd.read_csv('../X_train.csv',sep=',',header=0).values
+    y_train = pd.read_csv('../y_train.csv',sep=',',header=0).values
     X_pos = np.array([X_train[i,:] for i in range(X_train.shape[0]) if (y_train[i]==1)])
     y_pos = y_train[y_train==1]
     X_neg = np.array([X_train[i,:] for i in range(X_train.shape[0]) if (y_train[i]==0)])
@@ -51,8 +51,8 @@ def rf_classifier(feat):
     y_neg = []
     Over_under_X_train = []
     Over_under_y_train = []
-    X_valid = pd.read_csv('X_valid.csv',sep=',',header=0).values
-    y_valid = pd.read_csv('y_valid.csv',sep=',',header=None).values
+    X_valid = pd.read_csv('../X_valid.csv',sep=',',header=0).values
+    y_valid = pd.read_csv('../y_valid.csv',sep=',',header=None).values
     train_pred = rf.predict(X_train)
     valid_pred = rf.predict(X_valid)
     X_train = []
@@ -64,7 +64,7 @@ def rf_classifier(feat):
     auc_vl = auc(fpr_vl,tpr_vl)
 
     print(time.time()-t)
-    with open('hyperparameter_file.csv','a') as ref:
+    with open('../hyperparameter_file.csv','a') as ref:
         ref.write(str(max_features)+','+str(n_estimators)+','+str(auc_tr)+','+str(auc_vl)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
 
 
