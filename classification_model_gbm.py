@@ -69,7 +69,7 @@ def rf_classifier(feat):
 
     print(time.time()-t)
     with open('../hyperparameter_file_gbm.csv','a') as ref:
-        ref.write(str(max_features)+','+str(n_estimators)+','+str(auc_tr)+','+str(auc_vl)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
+        ref.write(str(max_features)+','+str(max_depth)+','+str(learning_rate)+','+str(n_estimators)+','+str(auc_tr)+','+str(auc_vl)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
 
 
 hy_params = []
