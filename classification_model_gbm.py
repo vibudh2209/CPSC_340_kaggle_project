@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Pool
 from contextlib import closing
 from functools import partial
-from sklearn.metrics import precision_score,recall_score,accuracy_score,roc_curve,auc
+from sklearn.metrics import precision_recall_curve,precision_score,recall_score,accuracy_score,roc_curve,auc
 from scipy.stats import mode
 import argparse
 
@@ -57,19 +57,20 @@ def rf_classifier(feat):
     Over_under_y_train = []
     X_valid = pd.read_csv('../X_valid.csv',sep=',',header=0).values
     y_valid = pd.read_csv('../y_valid.csv',sep=',',header=None).values
-    train_pred = rf.predict(X_train)
-    valid_pred = rf.predict(X_valid)
+    #train_pred = rf.predict(X_train)
+    valid_pred = rf.predict_proba(X_valid)[:,1]
     X_train = []
     X_valid = []
-    fpr_tr, tpr_tr, thresh_tr = roc_curve(y_train, train_pred)
+    #fpr_tr, tpr_tr, thresh_tr = roc_curve(y_train, train_pred)
     fpr_vl, tpr_vl, thresh_vl = roc_curve(y_valid, valid_pred)
 
-    auc_tr = auc(fpr_tr,tpr_tr)
+    #auc_tr = auc(fpr_tr,tpr_tr)
     auc_vl = auc(fpr_vl,tpr_vl)
-
+    pr,rl,tr = precision_recall_curve(y_valid,valid_pred)
+    pr_vl = pr[np.where(rl>0.9)[0][-1]]
     print(time.time()-t)
     with open('../hyperparameter_file_gbm.csv','a') as ref:
-        ref.write(str(max_features)+','+str(max_depth)+','+str(learning_rate)+','+str(n_estimators)+','+str(auc_tr)+','+str(auc_vl)+','+str(precision_score(y_train,train_pred))+','+str(recall_score(y_train,train_pred))+','+str(precision_score(y_valid,valid_pred))+','+str(recall_score(y_valid,valid_pred))+'\n')
+        ref.write(str(max_features)+','+str(max_depth)+','+str(learning_rate)+','+str(n_estimators)+','+str(auc_vl)+','+str(pr_vl)+'\n')
 
 
 hy_params = []
